@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Room</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .container h2 {
+      text-align: center;
+    }
+    .chat-box {
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .chat-box p {
+      margin: 0;
+    }
+    .input-box {
+      display: flex;
+    }
+    .input-box input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px 0 0 5px;
+    }
+    .input-box button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 0 5px 5px 0;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const socket = io();
+
+      // Load previous messages
+      socket.on('load messages', (messages) => {
+        const chatBox = document.getElementById('chat-box');
+        messages.forEach((message) => {
+          const newMessage = document.createElement('p');
+          newMessage.textContent = `${message.sender}: ${message.content}`;
+          chatBox.appendChild(newMessage);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+
+      // Handle new messages
+      document.getElementById('message').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          const messageInput = document.getElementById('message');
+          const message = messageInput.value.trim();
+
+          if (message !== '') {
+            const data = {
+              sender: 'User',
+              content: message
+            };
+
+            socket.emit('new message', data);
+
+            messageInput.value = '';
+            event.preventDefault();
+          }
+        }
+      });
+
+      // Handle new messages received from the server
+      socket.on('new message', (data) => {
+        const chatBox = document.getElementById('chat-box');
+        const newMessage = document.createElement('p');
+        newMessage.textContent = `${data.sender}: ${data.content}`;
+        chatBox.appendChild(newMessage);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Chat Room</h2>
+    <div class="chat-box" id="chat-box"></div>
+    <div class="input-box">
+      <input type="text" id="message" placeholder="Type your message...">
+      <button type="button">Send</button>
+    </div>
+  </div>
+</body>
+</html>
