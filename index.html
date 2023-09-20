@@ -1,105 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat Room</title>
+  <title>Login Page</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
     }
     .container {
-      max-width: 600px;
+      max-width: 400px;
       margin: 0 auto;
       padding: 20px;
-      background-color: #fff;
+      background-color: black;
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     .container h2 {
       text-align: center;
+      color: red;
     }
-    .chat-box {
-      height: 300px;
-      overflow-y: scroll;
+    .container input[type="text"],
+    .container input[type="password"] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
       border: 1px solid #ccc;
-      padding: 10px;
+      box-sizing: border-box;
     }
-    .chat-box p {
-      margin: 0;
-    }
-    .input-box {
-      display: flex;
-    }
-    .input-box input[type="text"] {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px 0 0 5px;
-    }
-    .input-box button {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 0 5px 5px 0;
-      background-color: #4CAF50;
-      color: white;
+    .container button {
+      background-color: red;
+      color: black;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
       cursor: pointer;
+      width: 100%;
+    }
+    .container button:hover {
+      opacity: 0.8;
     }
   </style>
-  <script src="/socket.io/socket.io.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const socket = io();
+    function validateLogin() {
+      var credentials = [
+        { username: "Adminxuser2", password: "4789", url: "source/Admin_X.html" },
+        { username: "Adminxuser3", password: "3839", url: "source/Admin_X.html" },
+        { username: "Adminxuser4", password: "4739", url: "source/Admin_X.html" }
+      ];
 
-      // Load previous messages
-      socket.on('load messages', (messages) => {
-        const chatBox = document.getElementById('chat-box');
-        messages.forEach((message) => {
-          const newMessage = document.createElement('p');
-          newMessage.textContent = `${message.sender}: ${message.content}`;
-          chatBox.appendChild(newMessage);
-        });
-        chatBox.scrollTop = chatBox.scrollHeight;
-      });
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
 
-      // Handle new messages
-      document.getElementById('message').addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-          const messageInput = document.getElementById('message');
-          const message = messageInput.value.trim();
-
-          if (message !== '') {
-            const data = {
-              sender: 'User',
-              content: message
-            };
-
-            socket.emit('new message', data);
-
-            messageInput.value = '';
-            event.preventDefault();
-          }
+      for (var i = 0; i < credentials.length; i++) {
+        if (username === credentials[i].username && password === credentials[i].password) {
+          window.location.href = credentials[i].url;
+          return false; // Prevent the form submission
         }
-      });
+      }
 
-      // Handle new messages received from the server
-      socket.on('new message', (data) => {
-        const chatBox = document.getElementById('chat-box');
-        const newMessage = document.createElement('p');
-        newMessage.textContent = `${data.sender}: ${data.content}`;
-        chatBox.appendChild(newMessage);
-        chatBox.scrollTop = chatBox.scrollHeight;
-      });
-    });
+      alert("Invalid username or password!");
+      return false;
+    }
   </script>
 </head>
 <body>
   <div class="container">
-    <h2>Chat Room</h2>
-    <div class="chat-box" id="chat-box"></div>
-    <div class="input-box">
-      <input type="text" id="message" placeholder="Type your message...">
-      <button type="button">Send</button>
-    </div>
+    <h2>Login</h2>
+    <form onsubmit="return validateLogin()">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit">Login</button>
+    </form>
   </div>
 </body>
 </html>
